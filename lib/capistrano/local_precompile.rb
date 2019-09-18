@@ -5,7 +5,7 @@ namespace :load do
     set :rsync_cmd,        "rsync -av --delete"
     set :assets_role,      "web"
 
-    after "bundler:install", "deploy:assets:prepare"
+    after "deploy:updated", "deploy:assets:prepare"
     after "deploy:assets:prepare", "deploy:assets:rsync"
     after "deploy:assets:rsync", "deploy:assets:cleanup"
   end
@@ -42,7 +42,7 @@ namespace :deploy do
           commands << "#{fetch(:rsync_cmd)} #{remote_shell} ./#{fetch(:assets_dir)}/ #{server.user}@#{server.hostname}:#{release_path}/#{fetch(:assets_dir)}/" if Dir.exists?(fetch(:assets_dir))
           commands << "#{fetch(:rsync_cmd)} #{remote_shell} ./#{fetch(:packs_dir)}/ #{server.user}@#{server.hostname}:#{release_path}/#{fetch(:packs_dir)}/" if Dir.exists?(fetch(:packs_dir))
 
-          commands.each do |command| 
+          commands.each do |command|
             if dry_run?
               SSHKit.config.output.info command
             else
